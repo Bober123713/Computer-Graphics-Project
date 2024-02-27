@@ -22,12 +22,15 @@
             <MenuItem Header="_Save File" Click="SaveImage_Click"/>
         </Menu>
         <ToolBar Grid.Row="1" Grid.ColumnSpan="3" Margin="1 0">
-            <Button Content="Blur" Click="Blur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Inverse" Click="Inverse_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Brightness Correction" Click="BrightnessCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Contrast Enhancement" Click="ContrastEnhancement_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Gamma Correction" Click="GammaCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+            <Button Content="Blur" Click="Blur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
         </ToolBar>
+        <DataGrid Grid.Row="3" Grid.Column="0">
+            
+        </DataGrid>
         <Border Grid.Row="3" Grid.Column="1" BorderBrush="Gray" BorderThickness="1">
             <ScrollViewer x:Name="ScrollViewerOriginal"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollChanged="OnScrollChanged">
                 <Image x:Name="OriginalImage" Source="{Binding Original, TargetNullValue=C:\\Users\\micha\\source\\repos\\CG1\\CG1\\CG1\\sampleimage.jpg}" Margin="10 0" HorizontalAlignment="Left" Grid.Column="1" Stretch="None"/>
@@ -35,7 +38,7 @@
         </Border>
         <Border Grid.Row="3" Grid.Column="2" BorderBrush="Gray" BorderThickness="1">
             <ScrollViewer x:Name="ScrollViewerEdited" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollChanged="OnScrollChanged">
-                <Image x:Name="EditedImage" Source="{Binding Edited, TargetNullValue=C:\\Users\\micha\\source\\repos\\CG1\\CG1\\CG1\\sampleimage.jpg}" Margin="10 0" HorizontalAlignment="Left" Grid.Column="2" Stretch="None"/>
+                <Image x:Name="EditedImage" Source="{Binding Edited}" Margin="10 0" HorizontalAlignment="Left" Grid.Column="2" Stretch="None"/>
             </ScrollViewer>
         </Border>
     </Grid>
