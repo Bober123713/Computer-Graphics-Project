@@ -11,20 +11,63 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Effects;
 using Microsoft.Win32;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 
 
 
 namespace CG1
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private Uri? original;
+
+        public Uri? Original
+        {
+            get => original;
+            set => SetField(ref original, value);
+        }
+
+        private Uri? edited;
+
+        public Uri? Edited
+        {
+            get => edited;
+            set => SetField(ref edited, value);
+        }
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            var changedScrollViewer = sender as ScrollViewer;
+            if (changedScrollViewer == ScrollViewerOriginal)
+            {
+                ScrollViewerEdited.ScrollToHorizontalOffset(changedScrollViewer.HorizontalOffset);
+                ScrollViewerEdited.ScrollToVerticalOffset(changedScrollViewer.VerticalOffset);
+            }
+            else if (changedScrollViewer == ScrollViewerEdited)
+            {
+                ScrollViewerOriginal.ScrollToHorizontalOffset(changedScrollViewer.HorizontalOffset);
+                ScrollViewerOriginal.ScrollToVerticalOffset(changedScrollViewer.VerticalOffset);
+            }
         }
 
         private WriteableBitmap ConvertToWriteableBitmap(BitmapSource bitmapSource)
@@ -42,55 +85,49 @@ namespace CG1
             openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg;*.bmp)|*.png;*.jpeg;*.jpg;*.bmp|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                RightImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                LeftImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                Original = Edited = new Uri(openFileDialog.FileName);
             }
         }
 
         private void SaveImage_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource source)
-            {
-                SaveFileDialog saveFileDialog = new SaveFileDialog
-                {
-                    Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp",
-                    FileName = "Image",
-                    DefaultExt = ".png" 
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    BitmapEncoder? encoder = null;
-                    switch (System.IO.Path.GetExtension(saveFileDialog.FileName).ToLowerInvariant())
-                    {
-                        case ".jpg":
-                        case ".jpeg":
-                            encoder = new JpegBitmapEncoder();
-                            break;
-                        case ".bmp":
-                            encoder = new BmpBitmapEncoder();
-                            break;
-                        case ".png":
-                        default:
-                            encoder = new PngBitmapEncoder();
-                            break;
-                    }
-
-                    encoder.Frames.Add(BitmapFrame.Create(source));
-
-                    using (var stream = File.Create(saveFileDialog.FileName))
-                    {
-                        encoder.Save(stream);
-                    }
-                }
-            }
-            else
+            if (EditedImage.Source is not BitmapSource source)
             {
                 MessageBox.Show("There is no image to save.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp",
+                FileName = "Image",
+                DefaultExt = ".png"
+            };
+
+            if (saveFileDialog.ShowDialog() != true) return;
+
+            BitmapEncoder? encoder = null;
+            switch (System.IO.Path.GetExtension(saveFileDialog.FileName).ToLowerInvariant())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    encoder = new JpegBitmapEncoder();
+                    break;
+                case ".bmp":
+                    encoder = new BmpBitmapEncoder();
+                    break;
+                case ".png":
+                default:
+                    encoder = new PngBitmapEncoder();
+                    break;
+            }
+
+            encoder.Frames.Add(BitmapFrame.Create(source));
+
+            using (var stream = File.Create(saveFileDialog.FileName))
+            {
+                encoder.Save(stream);
             }
         }
-
-
 
         private void ApplyBlur(WriteableBitmap WriteableBitmap)
         {
@@ -222,56 +259,54 @@ namespace CG1
         }
 
 
-
         private void Blur_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource bitmapSource)
+            if (EditedImage.Source is BitmapSource bitmapSource)
             {
                 WriteableBitmap WriteableBitmap = ConvertToWriteableBitmap(bitmapSource);
                 ApplyBlur(WriteableBitmap);
-                RightImage.Source = WriteableBitmap;
+                EditedImage.Source = WriteableBitmap;
             }
         }
 
-
         private void Inverse_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource bitmapSource)
+            if (EditedImage.Source is BitmapSource bitmapSource)
             {
                 WriteableBitmap WriteableBitmap = ConvertToWriteableBitmap(bitmapSource);
                 ApplyInversion(WriteableBitmap);
-                RightImage.Source = WriteableBitmap;
+                EditedImage.Source = WriteableBitmap;
             }
         }
 
         private void BrightnessCorrection_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource bitmapSource)
+            if (EditedImage.Source is BitmapSource bitmapSource)
             {
                 WriteableBitmap writeableBitmap = ConvertToWriteableBitmap(bitmapSource);
                 ApplyBrightnessCorrection(writeableBitmap, 20); // Example brightness value
-                RightImage.Source = writeableBitmap;
+                EditedImage.Source = writeableBitmap;
             }
         }
 
         private void ContrastEnhancement_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource bitmapSource)
+            if (EditedImage.Source is BitmapSource bitmapSource)
             {
                 WriteableBitmap writeableBitmap = ConvertToWriteableBitmap(bitmapSource);
                 ApplyContrastEnhancement(writeableBitmap, 20); // Example contrast value
-                RightImage.Source = writeableBitmap;
+                EditedImage.Source = writeableBitmap;
             }
         }
 
 
         private void GammaCorrection_Click(object sender, RoutedEventArgs e)
         {
-            if (RightImage.Source is BitmapSource bitmapSource)
+            if (EditedImage.Source is BitmapSource bitmapSource)
             {
                 WriteableBitmap writeableBitmap = ConvertToWriteableBitmap(bitmapSource);
                 ApplyGammaCorrection(writeableBitmap, 2.2); // Example gamma value
-                RightImage.Source = writeableBitmap;
+                EditedImage.Source = writeableBitmap;
             }
         }
 
