@@ -85,13 +85,11 @@ namespace CG1
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
 
-        private void ApplyBlur(WriteableBitmap WriteableBitmap)
+        private void ApplyBlur(WriteableBitmap source)
         {
-            int width = WriteableBitmap.PixelWidth;
-            int height = WriteableBitmap.PixelHeight;
-            int stride = width * (WriteableBitmap.Format.BitsPerPixel / 8);
-            byte[] pixels = new byte[height * stride];
-            WriteableBitmap.CopyPixels(pixels, stride, 0);
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
 
             for (int y = 1; y < height - 1; y++)
             {
@@ -115,7 +113,100 @@ namespace CG1
                 }
             }
 
-            WriteableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
+
+        private void ApplySharpening(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+
+            // Create a copy of the pixels to hold the original values
+            byte[] originalPixels = new byte[pixels.Length];
+            Array.Copy(pixels, originalPixels, pixels.Length);
+
+            // Define a simple sharpening kernel
+            int[,] kernel = {
+                { 0, -1,  0},
+                {-1,  5, -1},
+                { 0, -1,  0}
+            };
+
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    int pixelIndex = y * stride + x * 4;
+                    for (int channel = 0; channel < 3; channel++) // Apply for RGB channels, skip alpha channel
+                    {
+                        int sum = 0;
+                        for (int ky = -1; ky <= 1; ky++)
+                        {
+                            for (int kx = -1; kx <= 1; kx++)
+                            {
+                                int sampleIndex = (y + ky) * stride + (x + kx) * 4;
+                                sum += originalPixels[sampleIndex + channel] * kernel[ky + 1, kx + 1];
+                            }
+                        }
+
+                        // Clamp the values to [0, 255] and update the current pixel
+                        sum = Math.Max(0, Math.Min(255, sum));
+                        pixels[pixelIndex + channel] = (byte)sum;
+                    }
+                }
+            }
+
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        private void ApplySobelEdgeDetection(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+
+            // Create a clone of the pixels array to hold the edge data
+            byte[] edgePixels = new byte[pixels.Length];
+
+            // Sobel kernels for X and Y direction
+            int[,] gx = new int[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            int[,] gy = new int[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    float edgeX = 0;
+                    float edgeY = 0;
+
+                    // Apply kernels to the pixel and its neighborhood
+                    for (int ky = -1; ky <= 1; ky++)
+                    {
+                        for (int kx = -1; kx <= 1; kx++)
+                        {
+                            int pixelIndex = ((y + ky) * stride) + ((x + kx) * 4);
+                            byte pixelIntensity = (byte)((pixels[pixelIndex] + pixels[pixelIndex + 1] + pixels[pixelIndex + 2]) / 3);
+
+                            edgeX += gx[ky + 1, kx + 1] * pixelIntensity;
+                            edgeY += gy[ky + 1, kx + 1] * pixelIntensity;
+                        }
+                    }
+
+                    // Calculate the gradient magnitude
+                    byte edgeMagnitude = (byte)Math.Min(255, Math.Sqrt(edgeX * edgeX + edgeY * edgeY));
+
+                    int index = (y * stride) + (x * 4);
+                    edgePixels[index] = edgeMagnitude;
+                    edgePixels[index + 1] = edgeMagnitude;
+                    edgePixels[index + 2] = edgeMagnitude;
+                    edgePixels[index + 3] = 255; // Alpha channel
+                }
+            }
+
+            // Update the writeableBitmap with the edge data
+            source.WritePixels(new Int32Rect(0, 0, width, height), edgePixels, stride, 0);
+        }
+
     }
 }

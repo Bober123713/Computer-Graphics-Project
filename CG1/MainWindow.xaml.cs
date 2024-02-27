@@ -22,8 +22,6 @@ namespace CG1
         private const int CONTRAST = 20;
         private const double GAMMA = 2.2;
 
-
-
         public List<Action<WriteableBitmap>> Queue { get; set; } = [];
         
         private WriteableBitmap original;
@@ -138,18 +136,14 @@ namespace CG1
 
         private void BrightnessCorrection_Click(object sender, RoutedEventArgs e)
         {
-
             Queue.Add(ApplyBrightnessCorrection);
             ApplyNewest();
-
         }
 
         private void ContrastEnhancement_Click(object sender, RoutedEventArgs e)
         {
-          
             Queue.Add(ApplyContrastEnhancement);
             ApplyNewest();
-        
         }
 
         private void GammaCorrection_Click(object sender, RoutedEventArgs e)
@@ -157,6 +151,19 @@ namespace CG1
             Queue.Add(ApplyGammaCorrection);
             ApplyNewest();
         }
+
+        private void Sharpen_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(ApplySharpening);
+            ApplyNewest();
+        }
+
+        private void Edge_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(ApplySobelEdgeDetection);
+            ApplyNewest();
+        }
+
 
         //private void GaussianBlur_Click(object sender, RoutedEventArgs e)
         //{
