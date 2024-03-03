@@ -47,6 +47,7 @@ namespace CG1
             var image = new BitmapImage(source);
             Original = new WriteableBitmap(image);
             Edited = new WriteableBitmap(image);
+            InitializeIdentityFilter();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -121,6 +122,18 @@ namespace CG1
             var filter = Queue.Last();
             filter.Invoke(Edited);
         }
+        private void ResetImage_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Clear();
+            Edited = new WriteableBitmap(Original);
+            var removablePoints = FilterCanvas.Children.OfType<Ellipse>()
+                                .Where(ellipse => ellipse.Tag?.ToString() != "Immutable").ToList();
+            foreach (var point in removablePoints)
+            {
+                FilterCanvas.Children.Remove(point);
+            }
+            UpdatePolyline();
+        }
 
         private void Blur_Click(object sender, RoutedEventArgs e)
         {
@@ -176,6 +189,6 @@ namespace CG1
             Queue.Add(ApplyEmboss);
             ApplyNewest();
         }
-
     }
 }
+

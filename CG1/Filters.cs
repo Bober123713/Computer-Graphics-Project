@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace CG1
 {
@@ -271,10 +275,10 @@ namespace CG1
             // Define the emboss kernel
             // This is a simplified 3x3 emboss kernel
             int[,] kernel = {
-        { -2, -1, 0 },
-        { -1, 1, 1 },
-        { 0, 1, 2 }
-    };
+                { -2, -1, 0 },
+                { -1, 1, 1 },
+                { 0, 1, 2 }
+            };
 
             for (int y = 1; y < height - 1; y++)
             {
@@ -303,7 +307,5 @@ namespace CG1
             // Write the modified pixels back to the WriteableBitmap
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
-
-
     }
 }
