@@ -27,8 +27,10 @@
             <Button Content="Contrast Enhancement" Click="ContrastEnhancement_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Gamma Correction" Click="GammaCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Blur" Click="Blur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+            <Button Content="Gaussian Blur" Click="GaussianBlur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Sharpen" Click="Sharpen_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
             <Button Content="Edge Detection" Click="Edge_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+            <Button Content="Emboss" Click="Emboss_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
         </ToolBar>
         <DataGrid Grid.Row="3" Grid.Column="0">
             

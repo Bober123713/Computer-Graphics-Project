@@ -116,6 +116,56 @@ namespace CG1
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
 
+        private void ApplyGaussianBlur(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+
+            // Clone the original pixels to use as a reference
+            byte[] originalPixels = new byte[pixels.Length];
+            Array.Copy(pixels, originalPixels, pixels.Length);
+
+            // Simplified 3x3 Gaussian kernel with sigma = 1 (values approximated and normalized)
+            double[,] kernel = {
+        { 1/16d, 2/16d, 1/16d },
+        { 2/16d, 4/16d, 2/16d },
+        { 1/16d, 2/16d, 1/16d }
+    };
+
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    double[] sum = new double[3]; // Sum for each channel (RGB)
+
+                    // Apply the kernel to each neighbor
+                    for (int ky = -1; ky <= 1; ky++)
+                    {
+                        for (int kx = -1; kx <= 1; kx++)
+                        {
+                            int pixelIndex = ((y + ky) * stride) + ((x + kx) * 4);
+
+                            for (int channel = 0; channel < 3; channel++) // Apply for RGB channels, skip alpha channel
+                            {
+                                sum[channel] += originalPixels[pixelIndex + channel] * kernel[ky + 1, kx + 1];
+                            }
+                        }
+                    }
+
+                    int index = y * stride + x * 4;
+                    for (int channel = 0; channel < 3; channel++)
+                    {
+                        pixels[index + channel] = (byte)Math.Max(0, Math.Min(255, sum[channel]));
+                    }
+                }
+            }
+
+            // Write the modified pixels back to the source WriteableBitmap
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+
         private void ApplySharpening(WriteableBitmap source)
         {
             int width, height, stride;
@@ -207,6 +257,53 @@ namespace CG1
             // Update the writeableBitmap with the edge data
             source.WritePixels(new Int32Rect(0, 0, width, height), edgePixels, stride, 0);
         }
+
+        private void ApplyEmboss(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+
+            // Clone the original pixels to use as a reference
+            byte[] originalPixels = new byte[pixels.Length];
+            Array.Copy(pixels, originalPixels, pixels.Length);
+
+            // Define the emboss kernel
+            // This is a simplified 3x3 emboss kernel
+            int[,] kernel = {
+        { -2, -1, 0 },
+        { -1, 1, 1 },
+        { 0, 1, 2 }
+    };
+
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    int pixelIndex = y * stride + x * 4;
+                    for (int channel = 0; channel < 3; channel++)
+                    {
+                        int sum = 128; 
+                        for (int ky = -1; ky <= 1; ky++)
+                        {
+                            for (int kx = -1; kx <= 1; kx++)
+                            {
+                                int sampleIndex = (y + ky) * stride + (x + kx) * 4;
+                                sum += originalPixels[sampleIndex + channel] * kernel[ky + 1, kx + 1];
+                            }
+                        }
+
+                        // Clamp the result to the [0, 255] range
+                        sum = Math.Max(0, Math.Min(255, sum));
+                        pixels[pixelIndex + channel] = (byte)sum;
+                    }
+                }
+            }
+
+            // Write the modified pixels back to the WriteableBitmap
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
 
     }
 }

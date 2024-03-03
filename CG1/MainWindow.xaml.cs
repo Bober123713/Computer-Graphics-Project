@@ -165,11 +165,17 @@ namespace CG1
         }
 
 
-        //private void GaussianBlur_Click(object sender, RoutedEventArgs e)
-        //{
-        //    //Queue.Add(ApplyGaussianBlur);
-        //    //ApplyNewest();
-        //}
+        private void GaussianBlur_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(ApplyGaussianBlur);
+            ApplyNewest();
+        }
+
+        private void Emboss_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(ApplyEmboss);
+            ApplyNewest();
+        }
 
     }
 }
