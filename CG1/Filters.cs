@@ -15,6 +15,7 @@ namespace CG1
 {
     public partial class MainWindow
     {
+        #region FUCTIONALFILTERS
         private void ApplyInversion(WriteableBitmap WriteableBitmap)
         {
             int width, height, stride;
@@ -90,6 +91,10 @@ namespace CG1
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
 
+
+        #endregion
+
+        #region CONVOLUTIONFILTERS
         private void ApplyBlur(WriteableBitmap source)
         {
             int width, height, stride;
@@ -297,5 +302,7 @@ namespace CG1
 
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
+
+        #endregion
     }
 }

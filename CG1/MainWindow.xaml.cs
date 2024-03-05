@@ -124,6 +124,12 @@ namespace CG1
             filter.Apply(Edited);
         }
 
+        private void FunctionalFiltersTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+
         #region BUTTONCLICKS
 
         private void ResetImage_Click(object sender, RoutedEventArgs e)

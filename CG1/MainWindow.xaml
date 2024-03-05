@@ -23,12 +23,35 @@
             <MenuItem Header="_Reset Filters" Click="ResetImage_Click"/>
         </Menu>
         <TabControl Grid.Row="1" Grid.ColumnSpan="3">
-            <TabItem Header="Filters">
+            <TabItem Header="Functional Filters">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TabControl SelectionChanged="FunctionalFiltersTabControl_SelectionChanged">
+                        <TabItem Header="Inverse">
+                            <Button Content="Inverse" Click="Inverse_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+                        </TabItem>
+                        <TabItem Header="Brightness Correction">
+                            <Button Content="Brightness Correction" Click="BrightnessCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+                        </TabItem>
+                        <TabItem Header="Contrast Enhancement">
+                            <Button Content="Contrast Enhancement" Click="ContrastEnhancement_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+                        </TabItem>
+                        <TabItem Header="Gamma Correction">
+                            <Button Content="Gamma Correction" Click="GammaCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
+                        </TabItem>
+                    </TabControl>
+                    <Canvas Grid.Row="1" x:Name="FilterCanvas" Width="256" Height="256" Background="LightGray"
+                            MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" 
+                            MouseLeftButtonUp="Canvas_MouseLeftButtonUp" MouseRightButtonDown="Canvas_MouseRightButtonDown">
+                        <Polyline x:Name="FilterPolyline" Stroke="Black" StrokeThickness="2"/>
+                    </Canvas>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Convolution Filters" IsSelected="True">
                 <ToolBar Grid.Row="1" Grid.ColumnSpan="3" Margin="1 0">
-                    <Button Content="Inverse" Click="Inverse_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
-                    <Button Content="Brightness Correction" Click="BrightnessCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
-                    <Button Content="Contrast Enhancement" Click="ContrastEnhancement_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
-                    <Button Content="Gamma Correction" Click="GammaCorrection_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
                     <Button Content="Blur" Click="Blur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
                     <Button Content="Gaussian Blur" Click="GaussianBlur_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
                     <Button Content="Sharpen" Click="Sharpen_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
@@ -36,17 +59,11 @@
                     <Button Content="Emboss" Click="Emboss_Click" BorderBrush="LightGray" BorderThickness="0.5" Margin="0 3"/>
                 </ToolBar>
             </TabItem>
-            <TabItem Header="Functional Filters">
-                <Canvas x:Name="FilterCanvas" Width="256" Height="256" Background="LightGray"
-                            MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" MouseRightButtonDown="Canvas_MouseRightButtonDown">
-                    <Polyline x:Name="FilterPolyline" Stroke="Black" StrokeThickness="2"/>
-                </Canvas>
-            </TabItem>
         </TabControl>
         <DataGrid Grid.Row="3" Grid.Column="0" ItemsSource="{Binding Queue}" AutoGenerateColumns="False" 
                   AllowDrop="False" SelectedValue="{Binding SelectedFilter, Mode=OneWayToSource}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Filter" Binding="{Binding Path=Name}"/>
+                <DataGridTextColumn Header="Filter" Binding="{Binding Path=Name}" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
         <Border Grid.Row="3" Grid.Column="1" BorderBrush="Gray" BorderThickness="1">
