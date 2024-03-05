@@ -44,7 +44,7 @@ namespace CG1
         {
             InitializeComponent();
             DataContext = this;
-            var source = new Uri("C:\\Users\\micha\\source\\repos\\CG1\\CG1\\CG1\\sampleimage.jpg");
+            var source = new Uri("..\\..\\..\\sampleimage.jpg", UriKind.Relative);
             var image = new BitmapImage(source);
             Original = new WriteableBitmap(image);
             Edited = new WriteableBitmap(image);
@@ -123,6 +123,9 @@ namespace CG1
             var filter = Queue.Last();
             filter.Apply(Edited);
         }
+
+        #region BUTTONCLICKS
+
         private void ResetImage_Click(object sender, RoutedEventArgs e)
         {
             Queue.Clear();
@@ -189,6 +192,8 @@ namespace CG1
             Queue.Add(new Filter("Emboss",ApplyEmboss));
             ApplyNewest();
         }
+
+        #endregion
     }
 }
 

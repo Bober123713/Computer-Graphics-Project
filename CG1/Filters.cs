@@ -104,15 +104,15 @@ namespace CG1
                     for (int channel = 0; channel < 3; channel++)
                     {
                         int sum = 0;
-                        for (int ny = -1; ny <= 1; ny++)
+                        for (int ky = -1; ky <= 1; ky++)
                         {
-                            for (int nx = -1; nx <= 1; nx++)
+                            for (int kx = -1; kx <= 1; kx++)
                             {
-                                int neighborIndex = (y + ny) * stride + (x + nx) * 4;
-                                sum += pixels[neighborIndex + channel];
+                                int sampleIndex = (y + ky) * stride + (x + kx) * 4;
+                                sum += pixels[sampleIndex + channel];
                             }
                         }
-                        pixels[index + channel] = (byte)(sum / 9); // Average of the 3x3 kernel
+                        pixels[index + channel] = (byte)(sum / 9); 
                     }
                 }
             }
@@ -126,31 +126,28 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
-            // Clone the original pixels to use as a reference
             byte[] originalPixels = new byte[pixels.Length];
             Array.Copy(pixels, originalPixels, pixels.Length);
 
-            // Simplified 3x3 Gaussian kernel with sigma = 1 (values approximated and normalized)
             double[,] kernel = {
-                { 1/16d, 2/16d, 1/16d },
-                { 2/16d, 4/16d, 2/16d },
-                { 1/16d, 2/16d, 1/16d }
+                { 1/16.0, 2/16.0, 1/16.0 },
+                { 2/16.0, 4/16.0, 2/16.0 },
+                { 1/16.0, 2/16.0, 1/16.0 }
             };
 
             for (int y = 1; y < height - 1; y++)
             {
                 for (int x = 1; x < width - 1; x++)
                 {
-                    double[] sum = new double[3]; // Sum for each channel (RGB)
+                    double[] sum = new double[3]; 
 
-                    // Apply the kernel to each neighbor
                     for (int ky = -1; ky <= 1; ky++)
                     {
                         for (int kx = -1; kx <= 1; kx++)
                         {
                             int pixelIndex = ((y + ky) * stride) + ((x + kx) * 4);
 
-                            for (int channel = 0; channel < 3; channel++) // Apply for RGB channels, skip alpha channel
+                            for (int channel = 0; channel < 3; channel++) 
                             {
                                 sum[channel] += originalPixels[pixelIndex + channel] * kernel[ky + 1, kx + 1];
                             }
@@ -165,7 +162,6 @@ namespace CG1
                 }
             }
 
-            // Write the modified pixels back to the source WriteableBitmap
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
 
@@ -176,11 +172,9 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
-            // Create a copy of the pixels to hold the original values
             byte[] originalPixels = new byte[pixels.Length];
             Array.Copy(pixels, originalPixels, pixels.Length);
 
-            // Define a simple sharpening kernel
             int[,] kernel = {
                 { 0, -1,  0},
                 {-1,  5, -1},
@@ -192,7 +186,7 @@ namespace CG1
                 for (int x = 1; x < width - 1; x++)
                 {
                     int pixelIndex = y * stride + x * 4;
-                    for (int channel = 0; channel < 3; channel++) // Apply for RGB channels, skip alpha channel
+                    for (int channel = 0; channel < 3; channel++) 
                     {
                         int sum = 0;
                         for (int ky = -1; ky <= 1; ky++)
@@ -204,7 +198,6 @@ namespace CG1
                             }
                         }
 
-                        // Clamp the values to [0, 255] and update the current pixel
                         sum = Math.Max(0, Math.Min(255, sum));
                         pixels[pixelIndex + channel] = (byte)sum;
                     }
@@ -220,10 +213,8 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
-            // Create a clone of the pixels array to hold the edge data
             byte[] edgePixels = new byte[pixels.Length];
 
-            // Sobel kernels for X and Y direction
             int[,] gx = new int[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
             int[,] gy = new int[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
 
@@ -234,7 +225,6 @@ namespace CG1
                     float edgeX = 0;
                     float edgeY = 0;
 
-                    // Apply kernels to the pixel and its neighborhood
                     for (int ky = -1; ky <= 1; ky++)
                     {
                         for (int kx = -1; kx <= 1; kx++)
@@ -247,18 +237,16 @@ namespace CG1
                         }
                     }
 
-                    // Calculate the gradient magnitude
                     byte edgeMagnitude = (byte)Math.Min(255, Math.Sqrt(edgeX * edgeX + edgeY * edgeY));
 
                     int index = (y * stride) + (x * 4);
                     edgePixels[index] = edgeMagnitude;
                     edgePixels[index + 1] = edgeMagnitude;
                     edgePixels[index + 2] = edgeMagnitude;
-                    edgePixels[index + 3] = 255; // Alpha channel
+                    edgePixels[index + 3] = 255; 
                 }
             }
 
-            // Update the writeableBitmap with the edge data
             source.WritePixels(new Int32Rect(0, 0, width, height), edgePixels, stride, 0);
         }
 
@@ -268,12 +256,9 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
-            // Clone the original pixels to use as a reference
             byte[] originalPixels = new byte[pixels.Length];
             Array.Copy(pixels, originalPixels, pixels.Length);
 
-            // Define the emboss kernel
-            // This is a simplified 3x3 emboss kernel
             int[,] kernel = {
                 { -2, -1, 0 },
                 { -1, 1, 1 },
@@ -297,14 +282,12 @@ namespace CG1
                             }
                         }
 
-                        // Clamp the result to the [0, 255] range
                         sum = Math.Max(0, Math.Min(255, sum));
                         pixels[pixelIndex + channel] = (byte)sum;
                     }
                 }
             }
 
-            // Write the modified pixels back to the WriteableBitmap
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
     }

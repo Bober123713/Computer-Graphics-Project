@@ -44,7 +44,7 @@
             </TabItem>
         </TabControl>
         <DataGrid Grid.Row="3" Grid.Column="0" ItemsSource="{Binding Queue}" AutoGenerateColumns="False" 
-                  AllowDrop="False" SelectedValue="{Binding SelectedEffect, Mode=OneWayToSource}">
+                  AllowDrop="False" SelectedValue="{Binding SelectedFilter, Mode=OneWayToSource}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Filter" Binding="{Binding Path=Name}"/>
             </DataGrid.Columns>
