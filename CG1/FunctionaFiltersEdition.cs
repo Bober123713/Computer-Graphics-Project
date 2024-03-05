@@ -57,12 +57,7 @@ namespace CG1
             {
                 var newPos = e.GetPosition(FilterCanvas);
 
-                // Check if selectedPoint is at the edges
-                bool isLeftmostOrRightmost = selectedPoint.Equals(FilterCanvas.Children.OfType<Ellipse>().OrderBy(ellipse => Canvas.GetLeft(ellipse)).First()) ||
-                                             selectedPoint.Equals(FilterCanvas.Children.OfType<Ellipse>().OrderBy(ellipse => Canvas.GetLeft(ellipse)).Last());
-
-                // Allow vertical movement for the leftmost and rightmost points
-                if (isLeftmostOrRightmost)
+                if (selectedPoint.Tag != null && selectedPoint.Tag.ToString() == "Immutable")
                 {
                     Canvas.SetTop(selectedPoint, newPos.Y - selectedPoint.Height / 2);
                 }
@@ -78,6 +73,7 @@ namespace CG1
             }
         }
 
+
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             lastDragPoint = null;
@@ -89,7 +85,6 @@ namespace CG1
         {
             var mousePos = e.GetPosition(FilterCanvas);
 
-            // Find and remove the closest point to the right-click
             Ellipse? pointToRemove = null;
             foreach (var child in FilterCanvas.Children.OfType<Ellipse>())
             {
@@ -113,20 +108,18 @@ namespace CG1
 
         private Func<byte, byte> ConvertPolylineToFilterFunction()
         {
-            // Assuming the polyline points are sorted by X.
             var points = currentPolyline.Points.OrderBy(p => p.X).ToList();
 
             return (input) =>
             {
-                double x = input / 255.0 * FilterCanvas.Width; // Scale input to canvas coordinates
+                double x = input / 255.0 * FilterCanvas.Width;
                 for (int i = 0; i < points.Count - 1; i++)
                 {
                     if (x >= points[i].X && x <= points[i + 1].X)
                     {
-                        // Linear interpolation
                         double t = (x - points[i].X) / (points[i + 1].X - points[i].X);
                         double y = points[i].Y + t * (points[i + 1].Y - points[i].Y);
-                        return (byte)(y / FilterCanvas.Height * 255); // Scale output back to [0, 255]
+                        return (byte)(y / FilterCanvas.Height * 255);
                     }
                 }
                 return input;
@@ -149,12 +142,10 @@ namespace CG1
             }
 
             for (int i = 0; i < pixels.Length; i += 4)
-            {
-                // Assuming filterFunction takes a byte and returns a byte
-                pixels[i] = filterFunction(pixels[i]);     // For R channel
-                pixels[i + 1] = filterFunction(pixels[i + 1]); // For G channel
-                pixels[i + 2] = filterFunction(pixels[i + 2]); // For B channel
-                                                               // Alpha channel (pixels[i + 3]) unchanged
+            { 
+                pixels[i] = filterFunction(pixels[i]);     
+                pixels[i + 1] = filterFunction(pixels[i + 1]); 
+                pixels[i + 2] = filterFunction(pixels[i + 2]);                                             
             }
 
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
@@ -197,8 +188,8 @@ namespace CG1
         private void InitializeIdentityFilter()
         {
             DrawGridLines(FilterCanvas, 10);
-            CreateImmutablePoint(0, FilterCanvas.Height); // Bottom left
-            CreateImmutablePoint(FilterCanvas.Width, 0); // Top right
+            CreateImmutablePoint(0, FilterCanvas.Height); 
+            CreateImmutablePoint(FilterCanvas.Width, 0); 
             currentPolyline = new Polyline
             {
                 Stroke = Brushes.Black,
@@ -208,40 +199,6 @@ namespace CG1
             FilterCanvas.Children.Add(currentPolyline);
 
             UpdatePolyline();
-        }
-
-        private void DrawGridLines(Canvas canvas, int cellSize)
-        {
-            double width = canvas.Width;
-            double height = canvas.Height;
-
-            for (double y = 0; y <= height; y += cellSize)
-            {
-                Line line = new Line
-                {
-                    X1 = 0,
-                    X2 = width,
-                    Y1 = y,
-                    Y2 = y,
-                    Stroke = Brushes.LightSteelBlue,
-                    StrokeThickness = 0.5
-                };
-                canvas.Children.Add(line);
-            }
-
-            for (double x = 0; x <= width; x += cellSize)
-            {
-                Line line = new Line
-                {
-                    X1 = x,
-                    X2 = x,
-                    Y1 = 0,
-                    Y2 = height,
-                    Stroke = Brushes.LightSteelBlue,
-                    StrokeThickness = 0.5
-                };
-                canvas.Children.Add(line);
-            }
         }
     }
 }
