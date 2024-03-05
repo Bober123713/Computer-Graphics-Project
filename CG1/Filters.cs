@@ -132,10 +132,10 @@ namespace CG1
 
             // Simplified 3x3 Gaussian kernel with sigma = 1 (values approximated and normalized)
             double[,] kernel = {
-        { 1/16d, 2/16d, 1/16d },
-        { 2/16d, 4/16d, 2/16d },
-        { 1/16d, 2/16d, 1/16d }
-    };
+                { 1/16d, 2/16d, 1/16d },
+                { 2/16d, 4/16d, 2/16d },
+                { 1/16d, 2/16d, 1/16d }
+            };
 
             for (int y = 1; y < height - 1; y++)
             {

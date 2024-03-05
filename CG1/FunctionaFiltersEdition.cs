@@ -78,11 +78,11 @@ namespace CG1
             }
         }
 
-
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            lastDragPoint = null; // Reset dragging state
-            selectedPoint = null; // Deselect point
+            lastDragPoint = null;
+            selectedPoint = null;
+            ApplyCustomFilter(Edited);
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -108,8 +108,8 @@ namespace CG1
                 FilterCanvas.Children.Remove(pointToRemove);
                 UpdatePolyline();
             }
+            ApplyCustomFilter(Edited);
         }
-
 
         private Func<byte, byte> ConvertPolylineToFilterFunction()
         {
@@ -133,10 +133,8 @@ namespace CG1
             };
         }
 
-
         private void ApplyCustomFilter(WriteableBitmap source)
         {
-            // Assuming you have a way to convert polyline points to a filter function
             var filterFunction = ConvertPolylineToFilterFunction();
 
             int width, height, stride;
@@ -179,8 +177,8 @@ namespace CG1
                 .OrderBy(point => point.X).ToList();
 
             currentPolyline.Points = new PointCollection(points);
-            ApplyCustomFilter(Edited);
         }
+
         private void CreateImmutablePoint(double x, double y)
         {
             var point = new Ellipse
@@ -217,7 +215,6 @@ namespace CG1
             double width = canvas.Width;
             double height = canvas.Height;
 
-            // Horizontal lines
             for (double y = 0; y <= height; y += cellSize)
             {
                 Line line = new Line
@@ -232,7 +229,6 @@ namespace CG1
                 canvas.Children.Add(line);
             }
 
-            // Vertical lines
             for (double x = 0; x <= width; x += cellSize)
             {
                 Line line = new Line
