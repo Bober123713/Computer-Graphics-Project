@@ -139,7 +139,8 @@ namespace CG1
             {
                 for (int x = 1; x < width - 1; x++)
                 {
-                    double[] sum = new double[3]; 
+                    double[] sum = new double[3];
+                    int index = y * stride + x * 4;
 
                     for (int ky = -1; ky <= 1; ky++)
                     {
@@ -153,8 +154,7 @@ namespace CG1
                             }
                         }
                     }
-
-                    int index = y * stride + x * 4;
+                    
                     for (int channel = 0; channel < 3; channel++)
                     {
                         pixels[index + channel] = (byte)Math.Clamp(sum[channel], 0, 255);
@@ -164,7 +164,6 @@ namespace CG1
 
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
-
 
         private void ApplySharpening(WriteableBitmap source)
         {
@@ -198,8 +197,7 @@ namespace CG1
                             }
                         }
 
-                        sum = Math.Clamp(sum, 0, 255);
-                        pixels[pixelIndex + channel] = (byte)sum;
+                        pixels[pixelIndex + channel] = (byte)Math.Clamp(sum, 0, 255);
                     }
                 }
             }
@@ -215,8 +213,17 @@ namespace CG1
 
             byte[] edgePixels = new byte[pixels.Length];
 
-            int[,] gx = new int[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-            int[,] gy = new int[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+            int[,] gx = new int[,] { 
+                { -1, 0, 1 }, 
+                { -2, 0, 2 }, 
+                { -1, 0, 1 }
+            };
+
+            int[,] gy = new int[,] { 
+                { -1, -2, -1 }, 
+                { 0, 0, 0 }, 
+                { 1, 2, 1 }
+            };
 
             for (int y = 1; y < height - 1; y++)
             {
@@ -270,6 +277,7 @@ namespace CG1
                 for (int x = 1; x < width - 1; x++)
                 {
                     int pixelIndex = y * stride + x * 4;
+
                     for (int channel = 0; channel < 3; channel++)
                     {
                         int sum = 128; 
@@ -281,8 +289,7 @@ namespace CG1
                                 sum += originalPixels[sampleIndex + channel] * kernel[ky + 1, kx + 1];
                             }
                         }
-                        sum = Math.Clamp(sum, 0, 255);
-                        pixels[pixelIndex + channel] = (byte)sum;
+                        pixels[pixelIndex + channel] = (byte)Math.Clamp(sum, 0, 255);
                     }
                 }
             }
