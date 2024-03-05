@@ -102,8 +102,11 @@ public partial class MainWindow
             // Ensure the index is valid
             if (index != -1)
             {
-                if(index == 0 || index == userPoints.Count - 1)
-                    return;
+                if(index == 0 || index == userPoints.Count - 1) { 
+                    var newX = userPoints[index].X; // Keep the original X-coordinate
+                    var newY = newPos.Y; // Use the new Y-coordinate from the mouse position
+                    newPos = new Point(newX, newY); // Create a new point with the adjusted coordinates
+                }
                 // Update the point's position in UserPoints
                 userPoints[index] = newPos;
 
