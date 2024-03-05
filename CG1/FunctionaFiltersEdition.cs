@@ -9,6 +9,7 @@ public partial class MainWindow
 {
     private PointCollection _polylinePoints;
     private PointCollection _userPoints;
+    private Point? _selectedPoint = null;
 
     public PointCollection PolylinePoints
     {
@@ -53,15 +54,22 @@ public partial class MainWindow
 
     private void ClickCanvas(object sender, MouseButtonEventArgs e)
     {
-        const int Size = 9;
+        const int Size = 7;
 
         var pos = e.GetPosition(sender as Canvas);
         var x = (byte)pos.X;
         var y = (byte)pos.Y;
 
+        var closestPointIndex = UserPoints
+        .Select((p, index) => new { Point = p, Index = index })
+        .Where(p => Math.Abs(p.Point.X - x) < Size && Math.Abs(p.Point.Y - y) < Size)
+        .OrderBy(p => Math.Sqrt(Math.Pow(p.Point.X - x, 2) + Math.Pow(p.Point.Y - y, 2)))
+        .Select(p => p.Index)
+        .FirstOrDefault();
+
         if (UserPoints.Any(p => Math.Abs(p.X - x) < Size))
         {
-            MovePoint();
+            _selectedPoint = UserPoints[closestPointIndex];
             return;
         }
 
@@ -81,6 +89,47 @@ public partial class MainWindow
         PolylinePoints = points;
     }
 
+    private void MouseMoveCanvas(object sender, MouseEventArgs e)
+    {
+        // Check if the left mouse button is pressed and a point is selected
+        if (e.LeftButton == MouseButtonState.Pressed && _selectedPoint.HasValue)
+        {
+            var newPos = e.GetPosition(sender as Canvas);
+            // Find the index of the selected point in the UserPoints collection
+            int index = UserPoints.IndexOf(_selectedPoint.Value);
+            var userPoints = UserPoints.Clone();
+            var points = PolylinePoints.Clone();
+            // Ensure the index is valid
+            if (index != -1)
+            {
+                if(index == 0 || index == userPoints.Count - 1)
+                    return;
+                // Update the point's position in UserPoints
+                userPoints[index] = newPos;
+
+                // If not the first point, update the segment leading to this point
+                if (index > 0)
+                {
+                    var previousPoint = userPoints[index - 1];
+                    MovePointsBetween(previousPoint, newPos, ref points);
+                }
+                // If not the last point, update the segment leading from this point
+                if (index < userPoints.Count - 1)
+                {
+                    var nextPoint = userPoints[index + 1];
+                    MovePointsBetween(newPos, nextPoint, ref points);
+                }
+
+                // Update the selected point to the new position
+                _selectedPoint = newPos;
+
+                // Update the collections
+                UserPoints = userPoints;
+                PolylinePoints = points;
+            }
+        }
+    }
+
 
     private void MovePointsBetween(Point start, Point end, ref PointCollection points)
     {
@@ -91,10 +140,6 @@ public partial class MainWindow
             points[i] = new Point(points[i].X, start.Y + (i - (byte)start.X) * step);
     }
 
-    private void MovePoint()
-    {
-        return;
-    }
 
     private byte[] GetBytesFromPolyline()
     {

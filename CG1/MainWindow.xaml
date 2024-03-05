@@ -108,7 +108,8 @@
                         Height="256"
                         Background="LightGray"
                         MouseLeftButtonDown="ClickCanvas"
-                        MouseRightButtonDown="RightClickCanvas">
+                        MouseRightButtonDown="RightClickCanvas"
+                        MouseMove="MouseMoveCanvas">
                         <Polyline
                             Points="{Binding PolylinePoints}"
                             Stroke="Black"
