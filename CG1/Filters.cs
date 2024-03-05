@@ -157,7 +157,7 @@ namespace CG1
                     int index = y * stride + x * 4;
                     for (int channel = 0; channel < 3; channel++)
                     {
-                        pixels[index + channel] = (byte)Math.Max(0, Math.Min(255, sum[channel]));
+                        pixels[index + channel] = (byte)Math.Clamp(sum[channel], 0, 255);
                     }
                 }
             }
@@ -198,7 +198,7 @@ namespace CG1
                             }
                         }
 
-                        sum = Math.Max(0, Math.Min(255, sum));
+                        sum = Math.Clamp(sum, 0, 255);
                         pixels[pixelIndex + channel] = (byte)sum;
                     }
                 }
@@ -281,8 +281,7 @@ namespace CG1
                                 sum += originalPixels[sampleIndex + channel] * kernel[ky + 1, kx + 1];
                             }
                         }
-
-                        sum = Math.Max(0, Math.Min(255, sum));
+                        sum = Math.Clamp(sum, 0, 255);
                         pixels[pixelIndex + channel] = (byte)sum;
                     }
                 }
