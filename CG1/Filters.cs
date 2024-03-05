@@ -16,19 +16,45 @@ namespace CG1
     public partial class MainWindow
     {
         #region FUCTIONALFILTERS
+        private void ApplyFunctionalFilter(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+            byte[] bytes = GetBytesFromPolyline();
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = bytes[pixels[i]];
+            }
+
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        // Inversion
+
         private void ApplyInversion(WriteableBitmap WriteableBitmap)
         {
             int width, height, stride;
             byte[] pixels;
             GetPixels(WriteableBitmap, out width, out height, out stride, out pixels);
 
+            pixels = Inversion(pixels);
+
+            WriteableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        private static byte[] Inversion(byte[] pixels)
+        {
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = (byte)(255 - pixels[i]);
             }
 
-            WriteableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+            return pixels;
         }
+        
+        // Brightness correction
 
         private void ApplyBrightnessCorrection(WriteableBitmap source)
         {
@@ -36,6 +62,13 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
+            BrightnessCorrection(pixels);
+
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        private static byte[] BrightnessCorrection(byte[] pixels)
+        {
             for (int i = 0; i < pixels.Length; i++)
             {
                 int pixel = pixels[i] + BRIGHTNESS;
@@ -44,8 +77,10 @@ namespace CG1
                 pixels[i] = (byte)pixel;
             }
 
-            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+            return pixels;
         }
+
+        // Contrast enhancement
 
         private void ApplyContrastEnhancement(WriteableBitmap source)
         {
@@ -53,10 +88,17 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
+            ContrastEnhancement(pixels);
+
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        private static byte[] ContrastEnhancement(byte[] pixels)
+        {
             var contrast = (100.0 + CONTRAST) / 100.0;
             contrast *= contrast;
 
-            for (int i = 0; i < pixels.Length; i++) 
+            for (int i = 0; i < pixels.Length; i++)
             {
                 double pixel = pixels[i] / 255.0;
                 pixel -= 0.5;
@@ -68,8 +110,10 @@ namespace CG1
                 pixels[i] = (byte)pixel;
             }
 
-            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+            return pixels;
         }
+
+        //Gamma correction
 
         private void ApplyGammaCorrection(WriteableBitmap source)
         {
@@ -77,6 +121,13 @@ namespace CG1
             byte[] pixels;
             GetPixels(source, out width, out height, out stride, out pixels);
 
+            pixels = GammaCorrection(pixels);
+
+            source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+        }
+
+        private static byte[] GammaCorrection(byte[] pixels)
+        {
             double[] gammaCorrectionTable = new double[256];
             for (int i = 0; i < 256; i++)
             {
@@ -88,9 +139,31 @@ namespace CG1
                 pixels[i] = (byte)gammaCorrectionTable[pixels[i]];
             }
 
+            return pixels;
+        }
+
+        //Custom filter
+
+        private void ApplyCustomFilter(WriteableBitmap source)
+        {
+            int width, height, stride;
+            byte[] pixels;
+            GetPixels(source, out width, out height, out stride, out pixels);
+
+            pixels = CustomFilter(pixels);
+
             source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
         }
 
+        private static byte[] CustomFilter(byte[] pixels)
+        {
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = (byte)(pixels[i]);
+            }
+
+            return pixels;
+        }
 
         #endregion
 
@@ -118,7 +191,7 @@ namespace CG1
                                 sum += pixels[sampleIndex + channel];
                             }
                         }
-                        pixels[index + channel] = (byte)(sum / 9); 
+                        pixels[index + channel] = (byte)(sum / 9);
                     }
                 }
             }
@@ -154,13 +227,13 @@ namespace CG1
                         {
                             int pixelIndex = ((y + ky) * stride) + ((x + kx) * 4);
 
-                            for (int channel = 0; channel < 3; channel++) 
+                            for (int channel = 0; channel < 3; channel++)
                             {
                                 sum[channel] += originalPixels[pixelIndex + channel] * kernel[ky + 1, kx + 1];
                             }
                         }
                     }
-                    
+
                     for (int channel = 0; channel < 3; channel++)
                     {
                         pixels[index + channel] = (byte)Math.Clamp(sum[channel], 0, 255);
@@ -191,7 +264,7 @@ namespace CG1
                 for (int x = 1; x < width - 1; x++)
                 {
                     int pixelIndex = y * stride + x * 4;
-                    for (int channel = 0; channel < 3; channel++) 
+                    for (int channel = 0; channel < 3; channel++)
                     {
                         int sum = 0;
                         for (int ky = -1; ky <= 1; ky++)
@@ -219,15 +292,15 @@ namespace CG1
 
             byte[] edgePixels = new byte[pixels.Length];
 
-            int[,] gx = new int[,] { 
-                { -1, 0, 1 }, 
-                { -2, 0, 2 }, 
+            int[,] gx = new int[,] {
+                { -1, 0, 1 },
+                { -2, 0, 2 },
                 { -1, 0, 1 }
             };
 
-            int[,] gy = new int[,] { 
-                { -1, -2, -1 }, 
-                { 0, 0, 0 }, 
+            int[,] gy = new int[,] {
+                { -1, -2, -1 },
+                { 0, 0, 0 },
                 { 1, 2, 1 }
             };
 
@@ -286,7 +359,7 @@ namespace CG1
 
                     for (int channel = 0; channel < 3; channel++)
                     {
-                        int sum = 128; 
+                        int sum = 128;
                         for (int ky = -1; ky <= 1; ky++)
                         {
                             for (int kx = -1; kx <= 1; kx++)

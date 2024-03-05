@@ -22,9 +22,9 @@ namespace CG1
         private const int BRIGHTNESS = 20;
         private const int CONTRAST = 20;
         private const double GAMMA = 2.2;
-
+        private Dictionary<string, byte[]> Dictionary { get; set; } = [];
         public ObservableCollection<Filter> Queue { get; set; } = [];
-        
+
         private WriteableBitmap original;
 
         public WriteableBitmap Original
@@ -48,7 +48,28 @@ namespace CG1
             var image = new BitmapImage(source);
             Original = new WriteableBitmap(image);
             Edited = new WriteableBitmap(image);
-            InitializeIdentityFilter();
+            InitializeFunctionDictionary();
+        }
+
+        private void InitializeFunctionDictionary()
+        {
+            var bytes = new byte[256];
+            for (var i = 0; i < 256; i++)
+                bytes[i] = (byte)i;
+
+            AddFunction("TIInverse", Inversion, bytes);
+            AddFunction("TIBrightnessCorrection", BrightnessCorrection, bytes);
+            AddFunction("TIContrastEnhancement", ContrastEnhancement, bytes);
+            AddFunction("TIGammaCorrection", GammaCorrection, bytes);
+            AddFunction("TICustomFilter", CustomFilter, bytes);
+        }
+
+        private void AddFunction(string name, Func<byte[], byte[]> function, byte[] bytes)
+        {
+            var tempBytes = new byte[256];
+            Array.Copy(bytes, tempBytes, 256);
+            tempBytes = function.Invoke(tempBytes);
+            Dictionary.Add(name, tempBytes);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -116,7 +137,7 @@ namespace CG1
             {
                 encoder.Save(stream);
             }
-        }        
+        }
 
         private void ApplyNewest()
         {
@@ -126,7 +147,21 @@ namespace CG1
 
         private void FunctionalFiltersTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           
+            var selected = e.AddedItems[0] as TabItem;
+            var name = selected?.Name;
+            if (name is null || !Dictionary.ContainsKey(name))
+                return;
+
+            var values = Dictionary[name];
+            var points = new PointCollection();
+
+            for (var i = 0; i < 256; i++)
+                points.Add(new Point(i, 255 - values[i]));
+
+            PointCollection userPoints = [points[0], points[255]];
+
+            UserPoints = userPoints;
+            PolylinePoints = points;
         }
 
 
@@ -142,7 +177,36 @@ namespace CG1
             {
                 FilterCanvas.Children.Remove(point);
             }
-            UpdatePolyline();
+        }
+
+        private void Inverse_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(new Filter("Invert", ApplyFunctionalFilter));
+            ApplyNewest();
+        }
+
+        private void BrightnessCorrection_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(new Filter("Brightness Correction", ApplyFunctionalFilter));
+            ApplyNewest();
+        }
+
+        private void ContrastEnhancement_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(new Filter("Contrast Enhancement", ApplyFunctionalFilter));
+            ApplyNewest();
+        }
+
+        private void GammaCorrection_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(new Filter("Gamma Correction", ApplyFunctionalFilter));
+            ApplyNewest();
+        }
+
+        private void CustomFilter_Click(object sender, RoutedEventArgs e)
+        {
+            Queue.Add(new Filter("Custom Filter", ApplyFunctionalFilter));
+            ApplyNewest();
         }
 
         private void Blur_Click(object sender, RoutedEventArgs e)
@@ -151,39 +215,15 @@ namespace CG1
             ApplyNewest();
         }
 
-        private void Inverse_Click(object sender, RoutedEventArgs e)
-        {
-            Queue.Add(new Filter("Invert", ApplyInversion));
-            ApplyNewest();
-        }
-
-        private void BrightnessCorrection_Click(object sender, RoutedEventArgs e)
-        {
-            Queue.Add(new Filter ("Brightness Correction", ApplyBrightnessCorrection));
-            ApplyNewest();
-        }
-
-        private void ContrastEnhancement_Click(object sender, RoutedEventArgs e)
-        {
-            Queue.Add(new Filter ("Contrast Enhancement",ApplyContrastEnhancement));
-            ApplyNewest();
-        }
-
-        private void GammaCorrection_Click(object sender, RoutedEventArgs e)
-        {
-            Queue.Add(new Filter ("Gamma Correction", ApplyGammaCorrection));
-            ApplyNewest();
-        }
-
         private void Sharpen_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(new Filter ("Sharpen", ApplySharpening));
+            Queue.Add(new Filter("Sharpen", ApplySharpening));
             ApplyNewest();
         }
 
         private void Edge_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(new Filter ("Edge Detection", ApplySobelEdgeDetection));
+            Queue.Add(new Filter("Edge Detection", ApplySobelEdgeDetection));
             ApplyNewest();
         }
 
@@ -195,7 +235,7 @@ namespace CG1
 
         private void Emboss_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(new Filter("Emboss",ApplyEmboss));
+            Queue.Add(new Filter("Emboss", ApplyEmboss));
             ApplyNewest();
         }
 

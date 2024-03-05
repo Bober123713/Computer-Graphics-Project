@@ -8,6 +8,7 @@
     Title="MainWindow"
     Width="800"
     Height="450"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -33,7 +34,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TabControl Name="FunctionalFiltersTabControl" SelectionChanged="FunctionalFiltersTabControl_SelectionChanged">
-                        <TabItem Name="Inverse" Header="Inverse">
+                        <TabItem Name="TIInverse" Header="Inverse">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -41,7 +42,7 @@
                                 Click="Inverse_Click"
                                 Content="Inverse" />
                         </TabItem>
-                        <TabItem Name="BrightnessCorrection" Header="Brightness Correction">
+                        <TabItem Name="TIBrightnessCorrection" Header="Brightness Correction">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -49,7 +50,7 @@
                                 Click="BrightnessCorrection_Click"
                                 Content="Brightness Correction" />
                         </TabItem>
-                        <TabItem Name="ContrastEnhancement" Header="Contrast Enhancement">
+                        <TabItem Name="TIContrastEnhancement" Header="Contrast Enhancement">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -57,13 +58,21 @@
                                 Click="ContrastEnhancement_Click"
                                 Content="Contrast Enhancement" />
                         </TabItem>
-                        <TabItem Name="GammaCorrection" Header="Gamma Correction">
+                        <TabItem Name="TIGammaCorrection" Header="Gamma Correction">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
                                 BorderThickness="0.5"
                                 Click="GammaCorrection_Click"
                                 Content="Gamma Correction" />
+                        </TabItem>
+                        <TabItem Name="TICustomFilter" Header="Custom Filter">
+                            <Button
+                                Margin="0,3"
+                                BorderBrush="LightGray"
+                                BorderThickness="0.5"
+                                Click="CustomFilter_Click"
+                                Content="Custom Filter" />
                         </TabItem>
                     </TabControl>
                     <Canvas
@@ -72,14 +81,34 @@
                         Width="256"
                         Height="256"
                         Background="LightGray"
-                        MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
-                        MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                        MouseMove="Canvas_MouseMove"
-                        MouseRightButtonDown="Canvas_MouseRightButtonDown">
+                        MouseLeftButtonDown="ClickCanvas"
+                        MouseRightButtonDown="RightClickCanvas">
                         <Polyline
-                            x:Name="FilterPolyline"
+                            Points="{Binding PolylinePoints}"
                             Stroke="Black"
                             StrokeThickness="2" />
+                        <ItemsControl ItemsSource="{Binding UserPoints}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Line
+                                        Stroke="Black"
+                                        StrokeEndLineCap="Round"
+                                        StrokeStartLineCap="Round"
+                                        StrokeThickness="5" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Canvas>
                 </Grid>
             </TabItem>
