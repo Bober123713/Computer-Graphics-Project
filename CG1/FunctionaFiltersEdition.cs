@@ -53,7 +53,7 @@ public partial class MainWindow
 
     private void ClickCanvas(object sender, MouseButtonEventArgs e)
     {
-        const int Size = 0;
+        const int Size = 9;
 
         var pos = e.GetPosition(sender as Canvas);
         var x = (byte)pos.X;
@@ -71,9 +71,6 @@ public partial class MainWindow
         userPoints = new PointCollection(userPoints.OrderBy(p => p.X));
         var previousPoint = UserPoints.LastOrDefault(p => p.X < x);
         var nextPoint = UserPoints.FirstOrDefault(p => p.X > x);
-
-        //if (previousPoint == default || nextPoint == default)
-        //    return;
 
         var points = PolylinePoints.Clone();
 

@@ -157,11 +157,6 @@ namespace CG1
 
         private static byte[] CustomFilter(byte[] pixels)
         {
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                pixels[i] = (byte)(pixels[i]);
-            }
-
             return pixels;
         }
 

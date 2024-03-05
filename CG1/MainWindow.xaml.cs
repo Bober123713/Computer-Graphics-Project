@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace CG1
 {
@@ -171,12 +172,6 @@ namespace CG1
         {
             Queue.Clear();
             Edited = new WriteableBitmap(Original);
-            var removablePoints = FilterCanvas.Children.OfType<Ellipse>()
-                                .Where(ellipse => ellipse.Tag?.ToString() != "Immutable").ToList();
-            foreach (var point in removablePoints)
-            {
-                FilterCanvas.Children.Remove(point);
-            }
         }
 
         private void Inverse_Click(object sender, RoutedEventArgs e)

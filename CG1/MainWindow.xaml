@@ -67,12 +67,38 @@
                                 Content="Gamma Correction" />
                         </TabItem>
                         <TabItem Name="TICustomFilter" Header="Custom Filter">
-                            <Button
-                                Margin="0,3"
-                                BorderBrush="LightGray"
-                                BorderThickness="0.5"
-                                Click="CustomFilter_Click"
-                                Content="Custom Filter" />
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.ColumnSpan="2"
+                                    Margin="0,3"
+                                    BorderBrush="LightGray"
+                                    BorderThickness="0.5"
+                                    Click="CustomFilter_Click"
+                                    Content="Custom Filter" />
+                                <TextBox
+                                    x:Name="FilterNameTextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,3"
+                                    Text="Custom Filter" />
+                                <Button
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0,3"
+                                    BorderBrush="LightGray"
+                                    BorderThickness="0.5"
+                                    Click="SaveFilter_Click"
+                                    Content="Save Filter" />
+                            </Grid>
                         </TabItem>
                     </TabControl>
                     <Canvas
