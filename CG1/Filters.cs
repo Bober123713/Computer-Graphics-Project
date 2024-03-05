@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Threading.Channels;
 
 namespace CG1
 {
@@ -231,6 +232,7 @@ namespace CG1
                 {
                     float edgeX = 0;
                     float edgeY = 0;
+                    int index = (y * stride) + (x * 4);
 
                     for (int ky = -1; ky <= 1; ky++)
                     {
@@ -246,11 +248,10 @@ namespace CG1
 
                     byte edgeMagnitude = (byte)Math.Min(255, Math.Sqrt(edgeX * edgeX + edgeY * edgeY));
 
-                    int index = (y * stride) + (x * 4);
-                    edgePixels[index] = edgeMagnitude;
-                    edgePixels[index + 1] = edgeMagnitude;
-                    edgePixels[index + 2] = edgeMagnitude;
-                    edgePixels[index + 3] = 255; 
+                    for (int channel = 0; channel < 3; channel++)
+                    {
+                        edgePixels[index + channel] = edgeMagnitude;
+                    }
                 }
             }
 
