@@ -32,8 +32,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TabControl SelectionChanged="FunctionalFiltersTabControl_SelectionChanged">
-                        <TabItem Header="Inverse">
+                    <TabControl Name="FunctionalFiltersTabControl" SelectionChanged="FunctionalFiltersTabControl_SelectionChanged">
+                        <TabItem Name="Inverse" Header="Inverse">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -41,7 +41,7 @@
                                 Click="Inverse_Click"
                                 Content="Inverse" />
                         </TabItem>
-                        <TabItem Header="Brightness Correction">
+                        <TabItem Name="BrightnessCorrection" Header="Brightness Correction">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -49,7 +49,7 @@
                                 Click="BrightnessCorrection_Click"
                                 Content="Brightness Correction" />
                         </TabItem>
-                        <TabItem Header="Contrast Enhancement">
+                        <TabItem Name="ContrastEnhancement" Header="Contrast Enhancement">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"
@@ -57,7 +57,7 @@
                                 Click="ContrastEnhancement_Click"
                                 Content="Contrast Enhancement" />
                         </TabItem>
-                        <TabItem Header="Gamma Correction">
+                        <TabItem Name="GammaCorrection" Header="Gamma Correction">
                             <Button
                                 Margin="0,3"
                                 BorderBrush="LightGray"

@@ -126,7 +126,7 @@ namespace CG1
 
         private void FunctionalFiltersTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+           
         }
 
 
