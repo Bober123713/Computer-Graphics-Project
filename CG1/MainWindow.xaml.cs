@@ -13,6 +13,7 @@ using System.Windows.Media.Effects;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 
 namespace CG1
 {
@@ -22,7 +23,7 @@ namespace CG1
         private const int CONTRAST = 20;
         private const double GAMMA = 2.2;
 
-        public List<Action<WriteableBitmap>> Queue { get; set; } = [];
+        public ObservableCollection<Filter> Queue { get; set; } = [];
         
         private WriteableBitmap original;
 
@@ -120,7 +121,7 @@ namespace CG1
         private void ApplyNewest()
         {
             var filter = Queue.Last();
-            filter.Invoke(Edited);
+            filter.Apply(Edited);
         }
         private void ResetImage_Click(object sender, RoutedEventArgs e)
         {
@@ -137,56 +138,55 @@ namespace CG1
 
         private void Blur_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyBlur);
+            Queue.Add(new Filter("Blur", ApplyBlur));
             ApplyNewest();
         }
 
         private void Inverse_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyInversion);
+            Queue.Add(new Filter("Invert", ApplyInversion));
             ApplyNewest();
         }
 
         private void BrightnessCorrection_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyBrightnessCorrection);
+            Queue.Add(new Filter ("Brightness Correction", ApplyBrightnessCorrection));
             ApplyNewest();
         }
 
         private void ContrastEnhancement_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyContrastEnhancement);
+            Queue.Add(new Filter ("Contrast Enhancement",ApplyContrastEnhancement));
             ApplyNewest();
         }
 
         private void GammaCorrection_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyGammaCorrection);
+            Queue.Add(new Filter ("Gamma Correction", ApplyGammaCorrection));
             ApplyNewest();
         }
 
         private void Sharpen_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplySharpening);
+            Queue.Add(new Filter ("Sharpen", ApplySharpening));
             ApplyNewest();
         }
 
         private void Edge_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplySobelEdgeDetection);
+            Queue.Add(new Filter ("Edge Detection", ApplySobelEdgeDetection));
             ApplyNewest();
         }
 
-
         private void GaussianBlur_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyGaussianBlur);
+            Queue.Add(new Filter("Gaussian Blur", ApplyGaussianBlur));
             ApplyNewest();
         }
 
         private void Emboss_Click(object sender, RoutedEventArgs e)
         {
-            Queue.Add(ApplyEmboss);
+            Queue.Add(new Filter("Emboss",ApplyEmboss));
             ApplyNewest();
         }
     }
