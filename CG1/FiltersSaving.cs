@@ -47,9 +47,9 @@ public partial class MainWindow
             if (File.Exists("CustomFilters.json"))
             {
                 string json = File.ReadAllText("CustomFilters.json");
-                CustomFilters = JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(json) ?? new Dictionary<string, byte[]>();
+                Dictionary = JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(json) ?? new Dictionary<string, byte[]>();
 
-                foreach (var filterName in CustomFilters.Keys)
+                foreach (var filterName in Dictionary.Keys)
                 {
                     AddNewFilterTabItem(filterName);
                 }

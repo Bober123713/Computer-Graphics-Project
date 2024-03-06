@@ -94,19 +94,31 @@ public partial class MainWindow
         // Check if the left mouse button is pressed and a point is selected
         if (e.LeftButton == MouseButtonState.Pressed && _selectedPoint.HasValue)
         {
+            const int Size = 7;
+
             var newPos = e.GetPosition(sender as Canvas);
             // Find the index of the selected point in the UserPoints collection
             int index = UserPoints.IndexOf(_selectedPoint.Value);
             var userPoints = UserPoints.Clone();
             var points = PolylinePoints.Clone();
+
             // Ensure the index is valid
             if (index != -1)
             {
-                if(index == 0 || index == userPoints.Count - 1) { 
+                if(index == 0 || 
+                    index == userPoints.Count - 1) { 
                     var newX = userPoints[index].X; // Keep the original X-coordinate
                     var newY = newPos.Y; // Use the new Y-coordinate from the mouse position
                     newPos = new Point(newX, newY); // Create a new point with the adjusted coordinates
                 }
+                else if (userPoints[index - 1].X + Size > newPos.X ||
+                    newPos.X + Size > userPoints[index + 1].X)
+                {
+                    var newX = userPoints[index].X; // Keep the original X-coordinate
+                    var newY = newPos.Y; // Use the new Y-coordinate from the mouse position
+                    newPos = new Point(newX, newY); // Create a new point with the adjusted coordinates
+                }
+
                 // Update the point's position in UserPoints
                 userPoints[index] = newPos;
 
@@ -139,7 +151,7 @@ public partial class MainWindow
         var deltaY = end.Y - start.Y;
         var deltaX = end.X - start.X;
         var step = deltaY / deltaX;
-        for (var i = (byte)start.X; i < end.X; i++)
+        for (var i = (int)start.X; i <= end.X; i++)
             points[i] = new Point(points[i].X, start.Y + (i - (byte)start.X) * step);
     }
 
