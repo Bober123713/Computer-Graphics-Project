@@ -142,7 +142,7 @@ public partial class MainWindow
         return pixels;
     }
 
-    //Custom filter
+    //Default custom filter
 
     private void ApplyCustomFilter(WriteableBitmap source)
     {
@@ -158,6 +158,15 @@ public partial class MainWindow
     private static byte[] CustomFilter(byte[] pixels)
     {
         return pixels;
+    }
+
+    //Not default custom filter
+
+    private void ApplyCustomFilterNotDefault(string filterName)
+    {
+        Queue.Add(new Filter(filterName, ApplyFunctionalFilter));
+        ApplyNewest();
+        MessageBox.Show($"Applying filter: {filterName}");
     }
 
     #endregion

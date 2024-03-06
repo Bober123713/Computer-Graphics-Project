@@ -151,11 +151,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void FunctionalFiltersTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var selected = e.AddedItems[0] as TabItem;
-        var name = selected?.Name;
-        if (name is null || !Dictionary.ContainsKey(name))
+        var name = selected?.Name.Replace("_", " ");
+        if (name is null || !(Dictionary.ContainsKey(name) || CustomFilters.ContainsKey(name)))
             return;
 
-        var values = Dictionary[name];
+        var values = Dictionary.ContainsKey(name) ? Dictionary[name] : CustomFilters[name];
         var points = new PointCollection();
 
         for (var i = 0; i < 256; i++)
