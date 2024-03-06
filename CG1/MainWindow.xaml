@@ -108,6 +108,7 @@
                         Height="256"
                         Background="LightGray"
                         MouseLeftButtonDown="ClickCanvas"
+                        MouseLeftButtonUp="LeftMouseUpCanvas"
                         MouseMove="MouseMoveCanvas"
                         MouseRightButtonDown="RightClickCanvas">
                         <Polyline

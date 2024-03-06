@@ -89,6 +89,11 @@ public partial class MainWindow
         PolylinePoints = points;
     }
 
+    private void LeftMouseUpCanvas(object sender, MouseButtonEventArgs e)
+    {
+        _selectedPoint = null;
+    }
+
     private void MouseMoveCanvas(object sender, MouseEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed && _selectedPoint.HasValue)
