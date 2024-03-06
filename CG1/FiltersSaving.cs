@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,53 +12,89 @@ public partial class MainWindow
     private void SaveFilter_Click(object sender, RoutedEventArgs e)
     {
         byte[] values = GetBytesFromPolyline();
-        string filterName = FilterNameTextBox.Text;
+        string filterName = FilterNameTextBox.Text.Trim();
 
-        if (!Dictionary.ContainsKey(filterName)) 
+        if (string.IsNullOrEmpty(filterName) || CustomFilters.ContainsKey(filterName))
         {
-            Dictionary.Add(filterName, values);
-
-            AddTabItemForFilter(filterName);
-
-            MessageBox.Show("Filter added successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"A filter named {filterName} already exists or the name is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
         }
-        else
+
+        CustomFilters[filterName] = values;
+
+        SaveFiltersToJson();
+
+        AddNewFilterTabItem(filterName);
+    }
+
+    private void SaveFiltersToJson()
+    {
+        try
         {
-            MessageBox.Show("A filter with this name already exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            string json = JsonConvert.SerializeObject(CustomFilters);
+            File.WriteAllText("CustomFilters.json", json);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to save filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    private void AddTabItemForFilter(string filterName)
+    private void LoadFiltersFromJson()
     {
-        var tabItem = new TabItem
+        try
+        {
+            if (File.Exists("CustomFilters.json"))
+            {
+                string json = File.ReadAllText("CustomFilters.json");
+                CustomFilters = JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(json) ?? new Dictionary<string, byte[]>();
+
+                foreach (var filterName in CustomFilters.Keys)
+                {
+                    AddNewFilterTabItem(filterName);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to load filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void AddNewFilterTabItem(string filterName)
+    {
+        TabItem newTabItem = new TabItem
         {
             Header = filterName
         };
 
-        var applyButton = new Button
+        Button filterButton = new Button
         {
-            Content = "Apply " + filterName,
-            Margin = new Thickness(0, 3, 0, 3),
+            Content = filterName,
+            //Margin = new Thickness(0, 3),
             BorderBrush = Brushes.LightGray,
             BorderThickness = new Thickness(0.5)
         };
 
-        applyButton.Click += ApplyFilter_Click;
+        filterButton.Click += (sender, e) => ApplyCustomFilter(filterName);
 
-        var grid = new Grid();
-
-        grid.Children.Add(applyButton);
-
-        tabItem.Content = grid;
-
-        FunctionalFiltersTabControl.Items.Add(tabItem);
+        newTabItem.Content = filterButton;
+        FunctionalFiltersTabControl.Items.Add(newTabItem);
     }
 
-    private void ApplyFilter_Click(object sender, RoutedEventArgs e)
+    private void ApplyCustomFilter(string filterName)
     {
-
-        Queue.Add(new Filter(FilterNameTextBox.Text, ApplyFunctionalFilter));
+        // Assuming you have a method to apply a filter by name
+        // This is just a placeholder to show where you might hook in the application of the filter
+        Queue.Add(new Filter(filterName, ApplyFunctionalFilter));
         ApplyNewest();
-
+        MessageBox.Show($"Applying filter: {filterName}");
     }
+
+    // Your existing methods to get byte[] from polyline, etc.
+    //private byte[] GetBytesFromPolyline()
+    //{
+    //    // Placeholder for your actual implementation
+    //    return new byte[0];
+    //}
 }

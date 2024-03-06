@@ -24,6 +24,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private const int CONTRAST = 20;
     private const double GAMMA = 2.2;
     private Dictionary<string, byte[]> Dictionary { get; set; } = [];
+    private Dictionary<string, byte[]> CustomFilters { get; set; } = [];
     public ObservableCollection<Filter> Queue { get; set; } = [];
 
     private WriteableBitmap original;
@@ -49,6 +50,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var image = new BitmapImage(source);
         Original = new WriteableBitmap(image);
         Edited = new WriteableBitmap(image);
+        LoadFiltersFromJson();
         InitializeFunctionDictionary();
     }
 
