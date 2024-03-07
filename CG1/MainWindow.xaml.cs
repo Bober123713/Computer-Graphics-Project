@@ -101,6 +101,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var image = new BitmapImage(source);
             Original = new WriteableBitmap(image);
             Edited = new WriteableBitmap(image);
+            Queue.Clear();
         }
     }
 
@@ -240,6 +241,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     #endregion
 
+    #region RGBVSHTASK
     private void RgbToHsv_Click(object sender, RoutedEventArgs e)
     {
         int width = Edited.PixelWidth;
@@ -407,5 +409,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Convert.ToByte(Math.Round(b * 255))
         };
     }
+    #endregion
 }
 
