@@ -177,6 +177,25 @@
                         Content="Emboss" />
                 </ToolBar>
             </TabItem>
+            <TabItem Header="Lab Task 07.03.2024">
+                <ToolBar
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Margin="1,0">
+                    <Button
+                        Margin="0,3"
+                        BorderBrush="LightGray"
+                        BorderThickness="0.5"
+                        Click="RgbToHsv_Click"
+                        Content="RGB to HSV" />
+                    <Button
+                        Margin="0,3"
+                        BorderBrush="LightGray"
+                        BorderThickness="0.5"
+                        Click="HsvToRgb_Click"
+                        Content="HSV to RGB" />
+                </ToolBar>
+            </TabItem>
         </TabControl>
         <DataGrid
             Grid.Row="3"

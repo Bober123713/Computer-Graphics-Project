@@ -27,6 +27,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Dictionary<string, byte[]> CustomFilters { get; set; } = [];
     public ObservableCollection<Filter> Queue { get; set; } = [];
 
+
+
     private WriteableBitmap original;
 
     public WriteableBitmap Original
@@ -237,5 +239,173 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     #endregion
+
+    private void RgbToHsv_Click(object sender, RoutedEventArgs e)
+    {
+        int width = Edited.PixelWidth;
+        int height = Edited.PixelHeight;
+        int stride = width * (Edited.Format.BitsPerPixel / 8);
+        byte[] pixels = new byte[height * stride];
+        Edited.CopyPixels(pixels, stride, 0);
+
+        byte r, g, b;
+        int index;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                index = y * stride + 4 * x;
+                b = pixels[index];
+                g = pixels[index + 1];
+                r = pixels[index + 2];
+
+                byte[] hsv = RgbToHsv(r, g, b);
+
+                pixels[index + 2] = hsv[0]; 
+                pixels[index + 1] = hsv[1]; 
+                pixels[index] = hsv[2]; 
+            }
+        }
+
+        Edited.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
+
+    public static byte[] RgbToHsv(byte red, byte green, byte blue)
+    {
+        var r = red / 255.0;
+        var g = green / 255.0;
+        var b = blue / 255.0;
+
+        var max = Math.Max(r, Math.Max(g, b));
+        var min = Math.Min(r, Math.Min(g, b));
+        var delta = max - min;
+
+        double h, s, v;
+        h = 0; // default to black
+
+        if (delta != 0)
+        {
+            if (max == r)
+            {
+                h = (g - b) / delta;
+            }
+            else if (max == g)
+            {
+                h = 2 + (b - r) / delta;
+            }
+            else
+            {
+                h = 4 + (r - g) / delta;
+            }
+            h *= 60;
+            if (h < 0) h += 360;
+        }
+
+        v = max;
+        s = max == 0 ? 0 : delta / max;
+
+        return new byte[] {
+        (byte)((h / 360) * 255),
+        (byte)(s * 255),
+        (byte)(v * 255)
+    };
+    }
+
+
+    private void HsvToRgb_Click(object sender, RoutedEventArgs e)
+    {
+        int width = Edited.PixelWidth;
+        int height = Edited.PixelHeight;
+        int stride = width * (Edited.Format.BitsPerPixel / 8);
+        byte[] pixels = new byte[height * stride];
+        Edited.CopyPixels(pixels, stride, 0);
+        byte hue, saturation, value;
+        int index;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                index = y * stride + 4 * x;
+                hue = pixels[index + 2]; 
+                saturation = pixels[index + 1]; 
+                value = pixels[index]; 
+
+                byte[] rgb = HsvToRgb(hue, saturation, value);
+
+                pixels[index] = rgb[2]; 
+                pixels[index + 1] = rgb[1]; 
+                pixels[index + 2] = rgb[0]; 
+            }
+        }
+
+        Edited.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
+
+
+    public static byte[] HsvToRgb(byte h, byte s, byte v)
+    {
+        var hue = h * 360.0 / 255.0;
+        var saturation = s / 255.0;
+        var value = v / 255.0;
+        double f, p, q, t;
+
+        int i;
+
+        if (saturation == 0)
+        {
+            byte grey = Convert.ToByte(value * 255);
+            return new byte[] { grey, grey, grey };
+        }
+
+        hue /= 60; 
+        i = (int)Math.Floor(hue);
+        f = hue - i; 
+        p = value * (1 - saturation);
+        q = value * (1 - saturation * f);
+        t = value * (1 - saturation * (1 - f));
+
+        double r, g, b;
+        switch (i)
+        {
+            case 0:
+                r = value;
+                g = t;
+                b = p;
+                break;
+            case 1:
+                r = q;
+                g = value;
+                b = p;
+                break;
+            case 2:
+                r = p;
+                g = value;
+                b = t;
+                break;
+            case 3:
+                r = p;
+                g = q;
+                b = value;
+                break;
+            case 4:
+                r = t;
+                g = p;
+                b = value;
+                break;
+            default:    
+                r = value;
+                g = p;
+                b = q;
+                break;
+        }
+
+        return new byte[] {
+        Convert.ToByte(Math.Round(r * 255)),
+        Convert.ToByte(Math.Round(g * 255)),
+        Convert.ToByte(Math.Round(b * 255))
+        };
+    }
 }
 

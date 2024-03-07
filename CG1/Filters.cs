@@ -33,16 +33,16 @@ public partial class MainWindow
 
     // Inversion
 
-    private void ApplyInversion(WriteableBitmap WriteableBitmap)
-    {
-        int width, height, stride;
-        byte[] pixels;
-        GetPixels(WriteableBitmap, out width, out height, out stride, out pixels);
+    //private void ApplyInversion(WriteableBitmap WriteableBitmap)
+    //{
+    //    int width, height, stride;
+    //    byte[] pixels;
+    //    GetPixels(WriteableBitmap, out width, out height, out stride, out pixels);
 
-        pixels = Inversion(pixels);
+    //    pixels = Inversion(pixels);
 
-        WriteableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
-    }
+    //    WriteableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    //}
 
     private static byte[] Inversion(byte[] pixels)
     {
@@ -50,22 +50,21 @@ public partial class MainWindow
         {
             pixels[i] = (byte)(255 - pixels[i]);
         }
-
         return pixels;
     }
     
     // Brightness correction
 
-    private void ApplyBrightnessCorrection(WriteableBitmap source)
-    {
-        int width, height, stride;
-        byte[] pixels;
-        GetPixels(source, out width, out height, out stride, out pixels);
+    //private void ApplyBrightnessCorrection(WriteableBitmap source)
+    //{
+    //    int width, height, stride;
+    //    byte[] pixels;
+    //    GetPixels(source, out width, out height, out stride, out pixels);
 
-        BrightnessCorrection(pixels);
+    //    BrightnessCorrection(pixels);
 
-        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
-    }
+    //    source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    //}
 
     private static byte[] BrightnessCorrection(byte[] pixels)
     {
@@ -82,16 +81,16 @@ public partial class MainWindow
 
     // Contrast enhancement
 
-    private void ApplyContrastEnhancement(WriteableBitmap source)
-    {
-        int width, height, stride;
-        byte[] pixels;
-        GetPixels(source, out width, out height, out stride, out pixels);
+    //private void ApplyContrastEnhancement(WriteableBitmap source)
+    //{
+    //    int width, height, stride;
+    //    byte[] pixels;
+    //    GetPixels(source, out width, out height, out stride, out pixels);
 
-        ContrastEnhancement(pixels);
+    //    ContrastEnhancement(pixels);
 
-        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
-    }
+    //    source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    //}
 
     private static byte[] ContrastEnhancement(byte[] pixels)
     {
@@ -115,16 +114,16 @@ public partial class MainWindow
 
     //Gamma correction
 
-    private void ApplyGammaCorrection(WriteableBitmap source)
-    {
-        int width, height, stride;
-        byte[] pixels;
-        GetPixels(source, out width, out height, out stride, out pixels);
+    //private void ApplyGammaCorrection(WriteableBitmap source)
+    //{
+    //    int width, height, stride;
+    //    byte[] pixels;
+    //    GetPixels(source, out width, out height, out stride, out pixels);
 
-        pixels = GammaCorrection(pixels);
+    //    pixels = GammaCorrection(pixels);
 
-        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
-    }
+    //    source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    //}
 
     private static byte[] GammaCorrection(byte[] pixels)
     {
@@ -166,7 +165,7 @@ public partial class MainWindow
     {
         Queue.Add(new Filter(filterName, ApplyFunctionalFilter));
         ApplyNewest();
-        MessageBox.Show($"Applying filter: {filterName}");
+        MessageBox.Show($"Applying custom filter: {filterName}","Filter", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     #endregion
