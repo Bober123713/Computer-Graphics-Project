@@ -196,6 +196,31 @@
                         Content="HSV to RGB" />
                 </ToolBar>
             </TabItem>
+            <TabItem Header="Task 2">
+                <ToolBar
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Margin="1,0">
+                    <Button
+                        Margin="0,3"
+                        BorderBrush="LightGray"
+                        BorderThickness="0.5"
+                        Click="ToGrayscale_Click"
+                        Content="Grayscale" />
+                    <Button
+                        Margin="0,3"
+                        BorderBrush="LightGray"
+                        BorderThickness="0.5"
+                        Click="RandomDithering_Click"
+                        Content="Random Dithering" />
+                    <Button
+                        Margin="0,3"
+                        BorderBrush="LightGray"
+                        BorderThickness="0.5"
+                        Click="OctreeColourQuantization_Click"
+                        Content="Octree" />
+                </ToolBar>
+            </TabItem>
         </TabControl>
         <DataGrid
             Grid.Row="3"

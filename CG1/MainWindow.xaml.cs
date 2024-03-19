@@ -23,6 +23,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private const int BRIGHTNESS = 20;
     private const int CONTRAST = 20;
     private const double GAMMA = 2.2;
+
     private Dictionary<string, byte[]> Dictionary { get; set; } = [];
     private Dictionary<string, byte[]> CustomFilters { get; set; } = [];
     public ObservableCollection<Filter> Queue { get; set; } = [];
@@ -237,6 +238,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Queue.Add(new Filter("Emboss", ApplyEmboss));
         ApplyNewest();
+    }
+
+    private void ToGrayscale_Click(object sender, RoutedEventArgs e)
+    {
+        Queue.Add(new Filter("Grayscale", ApplyGrayscaleFilter));
+        ApplyNewest();
+    }
+
+    private void RandomDithering_Click(object sender, RoutedEventArgs e)
+    {
+        Queue.Add(new Filter("Random Dithering", ApplyRandomDithering));
+        ApplyNewest();
+    }
+
+    private void OctreeColourQuantization_Click(object sender, RoutedEventArgs e)
+    {
+
     }
 
     #endregion

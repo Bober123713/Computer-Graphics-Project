@@ -380,4 +380,60 @@ public partial class MainWindow
     }
 
     #endregion
+
+    #region TASK2
+    private void ApplyGrayscaleFilter(WriteableBitmap source)
+    {
+        int width, height, stride;
+        byte[] pixels;
+        GetPixels(source, out width, out height, out stride, out pixels);
+
+        for (int i = 0; i < pixels.Length; i += 4)
+        {
+            byte gray = (byte)(pixels[i + 2] * 0.299 + pixels[i + 1] * 0.587 + pixels[i] * 0.114);
+            pixels[i] = gray;
+            pixels[i + 1] = gray;
+            pixels[i + 2] = gray;
+        }
+
+        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
+
+    private void ApplyRandomDithering(WriteableBitmap source)
+    {
+        int width, height, stride;
+        byte[] pixels;
+        GetPixels(source, out width, out height, out stride, out pixels);
+
+        // Ensure the image is grayscale; this simplifies the dithering process.
+        //ApplyGrayscaleFilter(source);
+
+        Random rand = new Random();
+        for (int i = 0; i < pixels.Length; i += 4)
+        {
+            // Generate a random threshold to decide whether the pixel will be black or white.
+            byte threshold = (byte)rand.Next(256);
+
+            // Assuming pixels[i] is the grayscale value, as they are equal in a grayscale image.
+            if (pixels[i] < threshold)
+            {
+                // Set pixel to black
+                pixels[i] = 0; // R
+                pixels[i + 1] = 0; // G
+                pixels[i + 2] = 0; // B
+            }
+            else
+            {
+                // Set pixel to white
+                pixels[i] = 255; // R
+                pixels[i + 1] = 255; // G
+                pixels[i + 2] = 255; // B
+            }
+        }
+
+        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
+
+
+    #endregion
 }
