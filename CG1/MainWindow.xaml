@@ -213,12 +213,21 @@
                         BorderThickness="0.5"
                         Click="RandomDithering_Click"
                         Content="Random Dithering" />
+                </ToolBar>
+            </TabItem>
+            <TabItem Header="Task 2 - Octree">
+                <ToolBar>
                     <Button
                         Margin="0,3"
                         BorderBrush="LightGray"
                         BorderThickness="0.5"
                         Click="OctreeColourQuantization_Click"
                         Content="Octree" />
+                    <TextBox
+                        Name="ColorCountTextBox"
+                        MaxLength="5"
+                        PreviewTextInput="NumberValidationTextBox"
+                        Text="256" />
                 </ToolBar>
             </TabItem>
         </TabControl>

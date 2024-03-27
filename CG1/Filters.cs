@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Threading.Channels;
+using Media = System.Windows.Media;
 
 namespace CG1;
 
@@ -434,6 +435,63 @@ public partial class MainWindow
         source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
     }
 
+    private void ApplyOctreeQuantization(WriteableBitmap source)
+    {
+        int width, height, stride;
+        byte[] pixels;
+        GetPixels(source, out width, out height, out stride, out pixels);
+        var colors = GetColors(pixels);
+        var quantizer = new OctreeQuantizer();
+        foreach (var color in colors)
+            quantizer.AddColor(color);
+        var colorCount = 0;
+        try
+        {
+            colorCount = int.Parse(ColorCountTextBox.Text);
+        }
+        catch
+        {
+            return;
+        }
+        var palette = quantizer.MakePalette(colorCount);
+        for(var i = 0; i < colors.Count; i++)
+        {
+            var index = quantizer.GetPaletteIndex(colors[i]);
+            colors[i] = palette[index];
+        }
+        pixels = GetPixels(colors);
+        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
 
+    private byte[] GetPixels(List<Media.Color> colors)
+    {
+        var pixels = new byte[colors.Count * 4];
+
+        for(var i = 0; i < colors.Count; i++)
+        {
+            pixels[4 * i + 0] = colors[i].B;
+            pixels[4 * i + 1] = colors[i].G;
+            pixels[4 * i + 2] = colors[i].R;
+            pixels[4 * i + 3] = colors[i].A;
+        }
+
+        return pixels;
+    }
+
+    private List<Media.Color> GetColors(byte[] pixels)
+    {
+        var colors = new List<Media.Color>();
+
+        for(var i = 0; i < pixels.Length; i += 4)
+        {
+            var b = pixels[i];
+            var g = pixels[i + 1];
+            var r = pixels[i + 2];
+            var a = pixels[i + 3];
+            colors.Add(Media.Color.FromArgb(a, r, g, b));
+        }
+
+        return colors;
+    }
     #endregion
 }

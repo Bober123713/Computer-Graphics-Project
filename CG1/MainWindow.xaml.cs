@@ -254,7 +254,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OctreeColourQuantization_Click(object sender, RoutedEventArgs e)
     {
-
+        Queue.Add(new Filter("Octree Quantization", ApplyOctreeQuantization));
+        ApplyNewest();
     }
 
     #endregion
