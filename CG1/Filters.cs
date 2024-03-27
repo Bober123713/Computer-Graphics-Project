@@ -406,29 +406,24 @@ public partial class MainWindow
         byte[] pixels;
         GetPixels(source, out width, out height, out stride, out pixels);
 
-        // Ensure the image is grayscale; this simplifies the dithering process.
-        //ApplyGrayscaleFilter(source);
+        //ApplyGrayscaleFilter(source); // Could also do that but it is not necessary for it to functions
 
         Random rand = new Random();
         for (int i = 0; i < pixels.Length; i += 4)
         {
-            // Generate a random threshold to decide whether the pixel will be black or white.
             byte threshold = (byte)rand.Next(256);
 
-            // Assuming pixels[i] is the grayscale value, as they are equal in a grayscale image.
             if (pixels[i] < threshold)
             {
-                // Set pixel to black
-                pixels[i] = 0; // R
-                pixels[i + 1] = 0; // G
-                pixels[i + 2] = 0; // B
+                pixels[i] = 0; 
+                pixels[i + 1] = 0; 
+                pixels[i + 2] = 0; 
             }
             else
             {
-                // Set pixel to white
-                pixels[i] = 255; // R
-                pixels[i + 1] = 255; // G
-                pixels[i + 2] = 255; // B
+                pixels[i] = 255; 
+                pixels[i + 1] = 255; 
+                pixels[i + 2] = 255; 
             }
         }
 
@@ -463,35 +458,6 @@ public partial class MainWindow
         source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
     }
 
-    private byte[] GetPixels(List<Media.Color> colors)
-    {
-        var pixels = new byte[colors.Count * 4];
-
-        for(var i = 0; i < colors.Count; i++)
-        {
-            pixels[4 * i + 0] = colors[i].B;
-            pixels[4 * i + 1] = colors[i].G;
-            pixels[4 * i + 2] = colors[i].R;
-            pixels[4 * i + 3] = colors[i].A;
-        }
-
-        return pixels;
-    }
-
-    private List<Media.Color> GetColors(byte[] pixels)
-    {
-        var colors = new List<Media.Color>();
-
-        for(var i = 0; i < pixels.Length; i += 4)
-        {
-            var b = pixels[i];
-            var g = pixels[i + 1];
-            var r = pixels[i + 2];
-            var a = pixels[i + 3];
-            colors.Add(Media.Color.FromArgb(a, r, g, b));
-        }
-
-        return colors;
-    }
+    
     #endregion
 }

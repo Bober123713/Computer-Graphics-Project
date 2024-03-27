@@ -20,7 +20,6 @@ public class OctreeNode
     public Media.Color GetColor() => Color.GetNormalizedColor();
     public int PaletteIndex { get; set; }
     private OctreeNode?[] Children { get; } = new OctreeNode[8];
-
     public bool IsLeaf => Color.PixelCount > 0;
 
     public List<OctreeNode> GetLeafNodes()
@@ -41,19 +40,9 @@ public class OctreeNode
         return leafNodes;
     }
 
-    private int GetColorIndex(Color color, int level)
-    {
-        var index = 0;
-        var mask = 0b10000000 >> level;
-        if ((color.R & mask) != 0) index |= 0b100;
-        if ((color.G & mask) != 0) index |= 0b010;
-        if ((color.B & mask) != 0) index |= 0b001;
-        return index;
-    }
-
     public void AddColor(Media.Color color, int level, OctreeQuantizer parent)
     {
-        if(level >= OctreeQuantizer.MaxDepth)
+        if (level >= OctreeQuantizer.MaxDepth)
         {
             Color.Add(new(color));
             return;
@@ -76,7 +65,7 @@ public class OctreeNode
         if (Children[index] is not null)
             return Children[index]!.GetPaletteIndex(color, level + 1);
 
-        foreach(var node in Children)
+        foreach (var node in Children)
         {
             if (node is null)
                 continue;
@@ -90,7 +79,7 @@ public class OctreeNode
     {
         var result = 0;
 
-        for(var i = 0; i < Children.Count(); i++)
+        for (var i = 0; i < Children.Count(); i++)
         {
             if (Children[i] is null)
                 continue;
@@ -102,6 +91,17 @@ public class OctreeNode
 
         return result - 1;
     }
+
+    private int GetColorIndex(Color color, int level)
+    {
+        var index = 0;
+        var mask = 0b10000000 >> level;
+        if ((color.R & mask) != 0) index |= 0b100;
+        if ((color.G & mask) != 0) index |= 0b010;
+        if ((color.B & mask) != 0) index |= 0b001;
+        return index;
+    }
+    
 }
 
 public class OctreeQuantizer

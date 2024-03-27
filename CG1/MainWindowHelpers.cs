@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
+using Media = System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace CG1;
@@ -64,7 +65,50 @@ public partial class MainWindow
 
     private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
     {
+        TextBox textBox = sender as TextBox;
+        string updatedText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
+
         Regex regex = new Regex("[^0-9]+");
         e.Handled = regex.IsMatch(e.Text);
+
+        if (!e.Handled)
+        {
+            if (!int.TryParse(updatedText, out int result) || result == 0)
+            {
+                e.Handled = true; 
+            }
+        }
+    }
+
+
+    private byte[] GetPixels(List<Media.Color> colors)
+    {
+        var pixels = new byte[colors.Count * 4];
+
+        for (var i = 0; i < colors.Count; i++)
+        {
+            pixels[4 * i + 0] = colors[i].B;
+            pixels[4 * i + 1] = colors[i].G;
+            pixels[4 * i + 2] = colors[i].R;
+            pixels[4 * i + 3] = colors[i].A;
+        }
+
+        return pixels;
+    }
+
+    private List<Media.Color> GetColors(byte[] pixels)
+    {
+        var colors = new List<Media.Color>();
+
+        for (var i = 0; i < pixels.Length; i += 4)
+        {
+            var b = pixels[i];
+            var g = pixels[i + 1];
+            var r = pixels[i + 2];
+            var a = pixels[i + 3];
+            colors.Add(Media.Color.FromArgb(a, r, g, b));
+        }
+
+        return colors;
     }
 }

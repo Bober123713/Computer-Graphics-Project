@@ -218,16 +218,36 @@
             <TabItem Header="Task 2 - Octree">
                 <ToolBar>
                     <Button
+                        Height="35"
                         Margin="0,3"
                         BorderBrush="LightGray"
                         BorderThickness="0.5"
                         Click="OctreeColourQuantization_Click"
                         Content="Octree" />
-                    <TextBox
-                        Name="ColorCountTextBox"
-                        MaxLength="5"
-                        PreviewTextInput="NumberValidationTextBox"
-                        Text="256" />
+                    <Border BorderBrush="LightGray" BorderThickness="0.5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label
+                                Grid.Column="0"
+                                Margin="0,3"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="Number of colors:" />
+                            <TextBox
+                                Name="ColorCountTextBox"
+                                Grid.Column="1"
+                                Width="50"
+                                Margin="0,3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                MaxLength="4"
+                                PreviewTextInput="NumberValidationTextBox"
+                                Text="256" />
+                        </Grid>
+                    </Border>
                 </ToolBar>
             </TabItem>
         </TabControl>
