@@ -260,6 +260,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     #endregion
 
+    private void Pixelization_Click(object sender, RoutedEventArgs e)
+    {
+        Queue.Add(new Filter("Pixelize", ApplyPixelization));
+        ApplyNewest();
+    }
+
     #region RGBVSHTASK
     private void RgbToHsv_Click(object sender, RoutedEventArgs e)
     {

@@ -458,6 +458,54 @@ public partial class MainWindow
         source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
     }
 
-    
+
     #endregion
+
+    private void ApplyPixelization(WriteableBitmap source)
+    {
+        int width, height, stride;
+        byte[] pixels;
+        GetPixels(source, out width, out height, out stride, out pixels);
+
+        int chunkSize = int.Parse(PixelizationChunkSizeTextBox.Text);
+
+        for (int y = 0; y < height; y += chunkSize)
+        {
+            for (int x = 0; x < width; x += chunkSize)
+            {
+                int pixelCount = 0;
+                long totalR = 0, totalG = 0, totalB = 0;
+
+                for (int ky = y; ky < y + chunkSize && ky < height; ky++)
+                {
+                    for (int kx = x; kx < x + chunkSize && kx < width; kx++)
+                    {
+                        int index = ky * stride + kx * 4;
+                        totalB += pixels[index];
+                        totalG += pixels[index + 1];
+                        totalR += pixels[index + 2];
+                        pixelCount++;
+                    }
+                }
+
+                byte avgR = (byte)(totalR / pixelCount);
+                byte avgG = (byte)(totalG / pixelCount);
+                byte avgB = (byte)(totalB / pixelCount);
+
+                for (int ky = y; ky < y + chunkSize && ky < height; ky++)
+                {
+                    for (int kx = x; kx < x + chunkSize && kx < width; kx++)
+                    {
+                        int index = ky * stride + kx * 4;
+                        pixels[index] = avgB;
+                        pixels[index + 1] = avgG;
+                        pixels[index + 2] = avgR;
+                    }
+                }
+            }
+        }
+
+        source.WritePixels(new Int32Rect(0, 0, width, height), pixels, stride, 0);
+    }
+
 }
