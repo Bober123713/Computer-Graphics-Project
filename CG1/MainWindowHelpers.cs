@@ -67,18 +67,18 @@ public partial class MainWindow
     {
         TextBox textBox = sender as TextBox;
         string updatedText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
-
         Regex regex = new Regex("[^0-9]+");
         e.Handled = regex.IsMatch(e.Text);
 
         if (!e.Handled)
         {
-            if (!int.TryParse(updatedText, out int result) || result == 0)
+            if (updatedText == "0" || (int.TryParse(updatedText, out int result) && result == 0))
             {
-                e.Handled = true; 
+                e.Handled = true;
             }
         }
     }
+
 
 
     private byte[] GetPixels(List<Media.Color> colors)
